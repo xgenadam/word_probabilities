@@ -34,16 +34,10 @@ def LaterWords(sample, word, distance):
     @returns: a single word which is the most likely possibility
     '''
 
-    # TODO: Given a word, collect the relative probabilities of possible following words
-    # TODO: Repeat the above process--for each distance beyond 1, evaluate the words that
-    # might come after each word, and combine them weighting by relative probability
-    # into an estimate of what might appear next.
-
     word_succession_probabilities = next_word_probabilities_for_given_words(sample)
 
     cumulative_succession_probabilites = [word_succession_probabilities]
     for x in xrange(1, distance + 1):
-        print x
         next_prob = {preceeding_word: {succeeding_word: 0.0 for succeeding_word in word_succession_probabilities.keys()}
                      for preceeding_word in word_succession_probabilities.keys()}
         for preceeding_word, successive_word_dict in cumulative_succession_probabilites[x-1].items():
@@ -51,9 +45,11 @@ def LaterWords(sample, word, distance):
                 absolute_prob = word_succession_probabilities[preceeding_word][successive_word]
                 if absolute_prob > 0:
                     try:
-                        if x == 2:
-                            print successive_word, probability_of_successive_word, preceeding_word, probability_of_successive_word * word_succession_probabilities[preceeding_word][successive_word]
-                        next_prob[preceeding_word][successive_word] += probability_of_successive_word * word_succession_probabilities[preceeding_word][successive_word]
+                        # if x == 1:
+                        #     print successive_word, probability_of_successive_word, preceeding_word, probability_of_successive_word * word_succession_probabilities[preceeding_word][successive_word]
+                        probability_of_preceeding_word_given_successive_word = word_succession_probabilities[]
+                        print preceeding_word, probability_of_preceeding_word_given_successive_word
+                        next_prob[successive_word][preceeding_word] += (probability_of_successive_word * word_succession_probabilities[preceeding_word][successive_word])
                     except Exception as e:
                         import pdb; pdb.set_trace()
 
@@ -61,6 +57,8 @@ def LaterWords(sample, word, distance):
     # from @sample. You may want to import your code from the maximum likelihood exercise.
     # for w, p in cumulative_succession_probabilites[-1][word].items():
     #     print w, p
+    # import pdb; pdb.set_trace()
+
     most_likely_word = sorted(cumulative_succession_probabilites[-1][word].items(), key=lambda t: -t[1])[0][0]
     return most_likely_word
 
