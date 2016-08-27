@@ -22,9 +22,11 @@ corrupted_memo = '''
 Yeah, I'm gonna --- you to go ahead --- --- complain about this. Oh, and if you could --- --- and sit at the kids' table, that'd be ---
 '''
 
+
 words_to_guess = ["ahead", "could"]
 
 
+# TODO: check this
 def PriorWords(sample, word, distance):
     from max_likelihood import next_word_probabilities_for_given_words
     '''
@@ -67,11 +69,12 @@ def generate_successive_word_probabilities(sample, distance):
         next_prob = {preceeding_word: {succeeding_word: 0.0 for succeeding_word in word_succession_probabilities.keys()}
                      for preceeding_word in word_succession_probabilities.keys()}
         for first_word in word_succession_probabilities.keys():
-            for preceeding_word, preceeding_word_probability in cumulative_succession_probabilites[-1][first_word].items():
+            for preceeding_word in cumulative_succession_probabilites[-1][first_word].keys():
                 for successive_word in word_succession_probabilities.keys():
-                    next_prob[first_word][successive_word] += preceeding_word_probability * word_succession_probabilities[preceeding_word][successive_word]
+                    next_prob[first_word][successive_word] += cumulative_succession_probabilites[-1][first_word][preceeding_word] * word_succession_probabilities[preceeding_word][successive_word]
 
         cumulative_succession_probabilites.append(next_prob)
+    # import pdb; pdb.set_trace()
     return cumulative_succession_probabilites
 
 
@@ -79,4 +82,4 @@ def LaterWords(sample_text, word, distance):
     return sorted(generate_successive_word_probabilities(sample_text, distance)[-1][word].items(), key= lambda t: -t[1])[0][0]
 
 if __name__ == '__main__':
-    print LaterWords(sample_memo, "ahead", 2)
+    print LaterWords(sample_memo, "terrific", 1)

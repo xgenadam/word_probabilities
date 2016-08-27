@@ -18,8 +18,8 @@ Hello Peter, whats happening? Ummm, I'm gonna need you to go ahead and come in t
 #   Just use .split() to split the sample_memo text into words separated by spaces.
 
 
-def format_text(text, remove_chars=('.', ',', '\"', '!', '?', '\n'), replacement_char=''):
-    new_text = text.lower()
+def format_text(text, remove_chars=('.', ',', '\"', '!', '?'), replacement_char=' '):
+    new_text = text.replace('\n', ' ').lower()
     for remove_char in remove_chars:
         new_text = new_text.replace(remove_char, replacement_char)
     return new_text
