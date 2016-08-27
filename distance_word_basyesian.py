@@ -25,7 +25,7 @@ Yeah, I'm gonna --- you to go ahead --- --- complain about this. Oh, and if you 
 words_to_guess = ["ahead", "could"]
 
 
-def LaterWords(sample, word, distance):
+def PriorWords(sample, word, distance):
     from max_likelihood import next_word_probabilities_for_given_words
     '''
     @param sample: a sample of text to draw from
@@ -40,27 +40,43 @@ def LaterWords(sample, word, distance):
     for x in xrange(1, distance + 1):
         next_prob = {preceeding_word: {succeeding_word: 0.0 for succeeding_word in word_succession_probabilities.keys()}
                      for preceeding_word in word_succession_probabilities.keys()}
-        for preceeding_word, successive_word_dict in cumulative_succession_probabilites[x-1].items():
-            for successive_word, probability_of_successive_word in successive_word_dict.items():
-                absolute_prob = word_succession_probabilities[preceeding_word][successive_word]
-                if absolute_prob > 0:
-                    try:
-                        # if x == 1:
-                        #     print successive_word, probability_of_successive_word, preceeding_word, probability_of_successive_word * word_succession_probabilities[preceeding_word][successive_word]
-                        probability_of_preceeding_word_given_successive_word = word_succession_probabilities[]
-                        print preceeding_word, probability_of_preceeding_word_given_successive_word
-                        next_prob[successive_word][preceeding_word] += (probability_of_successive_word * word_succession_probabilities[preceeding_word][successive_word])
-                    except Exception as e:
-                        import pdb; pdb.set_trace()
+        for first_word in word_succession_probabilities.keys():
+            for preceeding_word, preceeding_word_probability in cumulative_succession_probabilites[-1][first_word].items():
+                for successive_word, successive_word_probability_dict in word_succession_probabilities.items():
+                    next_prob[first_word][successive_word] += preceeding_word_probability * successive_word_probability_dict[preceeding_word]
 
         cumulative_succession_probabilites.append(next_prob)
-    # from @sample. You may want to import your code from the maximum likelihood exercise.
-    # for w, p in cumulative_succession_probabilites[-1][word].items():
-    #     print w, p
-    # import pdb; pdb.set_trace()
 
     most_likely_word = sorted(cumulative_succession_probabilites[-1][word].items(), key=lambda t: -t[1])[0][0]
     return most_likely_word
 
 
-print LaterWords(sample_memo, "ahead", 2)
+def generate_successive_word_probabilities(sample, distance):
+    from max_likelihood import next_word_probabilities_for_given_words
+    '''
+    @param sample: a sample of text to draw from
+    @param word: a word occuring before a corrupted sequence
+    @param distance: how many words later to estimate (i.e. 1 for the next word, 2 for the word after that)
+    @returns: a single word which is the most likely possibility
+    '''
+
+    word_succession_probabilities = next_word_probabilities_for_given_words(sample)
+
+    cumulative_succession_probabilites = [word_succession_probabilities]
+    for x in xrange(1, distance):
+        next_prob = {preceeding_word: {succeeding_word: 0.0 for succeeding_word in word_succession_probabilities.keys()}
+                     for preceeding_word in word_succession_probabilities.keys()}
+        for first_word in word_succession_probabilities.keys():
+            for preceeding_word, preceeding_word_probability in cumulative_succession_probabilites[-1][first_word].items():
+                for successive_word in word_succession_probabilities.keys():
+                    next_prob[first_word][successive_word] += preceeding_word_probability * word_succession_probabilities[preceeding_word][successive_word]
+
+        cumulative_succession_probabilites.append(next_prob)
+    return cumulative_succession_probabilites
+
+
+def LaterWords(sample_text, word, distance):
+    return sorted(generate_successive_word_probabilities(sample_text, distance)[-1][word].items(), key= lambda t: -t[1])[0][0]
+
+if __name__ == '__main__':
+    print LaterWords(sample_memo, "ahead", 2)
